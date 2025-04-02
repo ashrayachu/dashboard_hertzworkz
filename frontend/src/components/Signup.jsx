@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Move useNavigate to the top
+import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from './AuthLayout';
 import InputField from './InputField';
 import SubmitButton from './SubmitButton';
 import ErrorAlert from './ErrorAlert';
-import { validateEmail, validatePassword, validateName, validatePasswordMatch } from '../utlis/validation';
+import { validateEmail, validatePassword, validateName, validatePasswordMatch, validatePhone } from '../utlis/validation';
+import { toast } from 'react-toastify';
 
 function Signup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,12 +18,14 @@ function Signup() {
   const [errors, setErrors] = useState({
     name: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
   });
   const [touched, setTouched] = useState({
     name: false,
     email: false,
+    phone: false,
     password: false,
     confirmPassword: false,
   });
@@ -30,21 +34,22 @@ function Signup() {
   const navigate = useNavigate(); 
 
   useEffect(() => {
-    // Validate the form whenever inputs change
     const nameError = validateName(name);
     const emailError = validateEmail(email);
+    const phoneError = validatePhone(phone);
     const passwordError = validatePassword(password);
     const confirmPasswordError = validatePasswordMatch(password, confirmPassword);
     
     setErrors({
       name: nameError,
       email: emailError,
+      phone: phoneError,
       password: passwordError,
       confirmPassword: confirmPasswordError,
     });
     
-    setIsFormValid(!nameError && !emailError && !passwordError && !confirmPasswordError);
-  }, [name, email, password, confirmPassword]);
+    setIsFormValid(!nameError && !emailError && !phoneError && !passwordError && !confirmPasswordError);
+  }, [name, email, phone, password, confirmPassword]);
 
   const handleBlur = (field) => {
     setTouched({ ...touched, [field]: true });
@@ -53,10 +58,10 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Set all fields as touched to show validation errors
     setTouched({
       name: true,
       email: true,
+      phone: true,
       password: true,
       confirmPassword: true,
     });
@@ -69,23 +74,24 @@ function Signup() {
     setError('');
     
     try {
-      
       const response = await fetch('https://dashboard-api-7vei.onrender.com/api/user/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username:name, email, password }),
+        body: JSON.stringify({ username: name, email, mobileNumber:phone, password }),
       });
       
       const data = await response.json();
       
       if (!response.ok) {
+        toast.error('Signup failed');
         throw new Error(data.message || 'Signup failed');
       }
-      
-      navigate('/signin?registered=true'); // Use navigate for redirection
+      toast.success('Signup successful! Please log in.');
+      navigate('/login');
     } catch (err) {
+      toast.error('Signup failed');
       setError(err.message || 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
@@ -121,6 +127,18 @@ function Signup() {
           error={touched.email ? errors.email : ''}
         />
         
+        <InputField
+          id="phone"
+          type="tel"
+          label="Phone Number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          onBlur={() => handleBlur('phone')}
+          placeholder="9876543210"
+          required
+          error={touched.phone ? errors.phone : ''}
+        />
+
         <InputField
           id="password"
           type="password"
@@ -162,7 +180,7 @@ function Signup() {
         </p>
       </div>
     </AuthLayout>
-  );
+  )
 }
 
 export default Signup;

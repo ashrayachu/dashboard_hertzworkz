@@ -25,3 +25,9 @@ export const validateEmail = (email) => {
     if (password !== confirmPassword) return "Passwords do not match";
     return "";
   };
+  export const validatePhone = (phoneNumber) => {
+    const phoneRegex = /^[6789]\d{9}$/;
+    if (!phoneNumber) return "Phone number is required";
+    if (!phoneRegex.test(phoneNumber)) return "Please enter a valid 10-digit Indian phone number";
+    return "";
+  };
