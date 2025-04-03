@@ -1,23 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar from './Sidebar';
-import Navbar from './Navbar';
-import EditProfileModal from './EditProfileModel';
+import Sidebar from '../../components/Sidebar';
+import Navbar from '../../components/Navbar';
+import EditProfileModal from '../../components/EditProfileModel';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
-import { toast } from 'react-toastify';
-import axios from 'axios';
+import { updateUserProfile } from '../../services/updateInfo';
 
 const Profile = () => {
     const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
-    const [editFormData, setEditFormData] = useState({
-        username: '',
-        email: '',
-        phoneNumber: ''
-    });
-   
+
+
 
     useEffect(() => {
         const token = Cookies.get('token');
@@ -50,35 +43,26 @@ const Profile = () => {
     };
 
     const handleUpdateProfile = async (updatedFormData) => {
-        const token = Cookies.get('token');
-        if (!token) return;
-
         try {
-            const response = await axios.put(
-                'https://dashboard-api-7vei.onrender.com/api/user/update-info',
-                updatedFormData
-            );
-
-            const updatedData = response.data;
-            console.log('Updated Data:', updatedData);
-
-            // Update the token in cookies if a new one is provided
-            if (updatedData.accessToken) {
-                Cookies.set('token', updatedData.accessToken);
+            const updatedData = await updateUserProfile(updatedFormData);
+            if (updatedData) {
+                setUser({
+                    name: updatedData.username,
+                    email: updatedData.email,
+                    mobileNumber: updatedData.mobileNumber
+                });
             }
-
             handleCloseModal();
-            toast.success('Profile updated successfully!');
         } catch (err) {
-            console.error('Update Error:', err.message);
-            toast.error('Failed to update profile');
+            console.error('Update failed:', err);
         }
     };
 
 
+
     return (
         <div className="flex h-screen bg-gray-100">
-            <Sidebar />
+       
             <div className="flex-1 flex flex-col">
                 <Navbar />
                 <main className="p-6">

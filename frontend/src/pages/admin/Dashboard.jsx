@@ -1,33 +1,42 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-import Sidebar from './Sidebar';
-import Navbar from './Navbar';
+import Sidebar from '../../components/Sidebar';
+import Navbar from '../../components/Navbar';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import { dashboardInfo } from '../../services/dashboard';
+import { jwtDecode } from 'jwt-decode';
+import { toast } from 'react-toastify';
+
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 function Dashboard() {
     const [data, setData] = useState();
     const navigate = useNavigate();
-    const isAuthenticated = Cookies.get("token"); // Get token from cookies
-
+    const token = Cookies.get("token"); // Get token from cookies
+    const decoded = jwtDecode(token); // Decode the token to get user info
+    const user = decoded.role; // Get role from decoded token
     useEffect(() => {
-        if (!isAuthenticated) {
+        if (user !="ADMIN") {
             navigate("/login"); // Redirect to login if not authenticated
+            toast.error("You are not authorized to access this page.");
         }
-    }, [isAuthenticated, navigate]);
+    }, [user, navigate]);
+
 
     useEffect(() => {
-        axios.get('https://dashboard-api-7vei.onrender.com/api/user/dashboard')
-            .then(response => {
-                setData(response.data);
-            })
-            .catch(error => {
+        const getData = async () => {
+            try {
+                const dashboardData = await dashboardInfo(); // Call API function
+                setData(dashboardData);
+                console.log('Dashboard data:', dashboardData);
+            } catch (error) {
                 console.error('Error fetching data:', error);
-            });
+            }
+        };
+        getData();
     }, []);
 
     const pieData = {

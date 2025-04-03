@@ -21,8 +21,8 @@ const Sidebar = () => {
                 <div>
                     <h2 className="text-xl font-bold">Sidebar</h2>
                     <ul className="mt-4 flex flex-col space-y-2 items-start">
-                        <li><Link to="/dashboard" className="block py-2  ">Dashboard</Link></li>
-                        <li><Link to="/profile" className="block py-2  ">Profile</Link></li>
+                        <li><Link to="/admin/dashboard" className="block py-1  ">Dashboard</Link></li>
+                        <li><Link to="/admin/add-products" className="block py-1">add Products</Link></li>
                     </ul>
 
                 </div>
@@ -33,8 +33,8 @@ const Sidebar = () => {
                 <div className='absolute top-20 px-5 text-white'>
                     <h2 className="text-xl font-bold">Sidebar</h2>
                     <ul className="mt-4 flex flex-col space-y-2 items-start">
-                        <li><Link to="/dashboard" className="block py-1  ">Dashboard</Link></li>
-                        <li><Link to="/profile" className="block py-1 ">Profile</Link></li>
+                        <li><Link to="/admin/dashboard" className="block py-1  ">Dashboard</Link></li>
+                        <li><Link to="/admin/add-products" className="block py-1">add Products</Link></li>
                     </ul>
 
                 </div>

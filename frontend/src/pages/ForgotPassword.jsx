@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import AuthLayout from './AuthLayout';
-import InputField from './InputField';
-import SubmitButton from './SubmitButton';
-import ErrorAlert from './ErrorAlert';
+import AuthLayout from '../components/AuthLayout';
+import InputField from '../components/InputField';
+import SubmitButton from '../components/SubmitButton';
+import ErrorAlert from '../components/ErrorAlert';
 import axios from 'axios';
 import { validateEmail } from '../utlis/validation';
 

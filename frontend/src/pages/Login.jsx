@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Move useNavigate to the top
-import AuthLayout from './AuthLayout';
-import InputField from './InputField';
-import SubmitButton from './SubmitButton';
-import ErrorAlert from './ErrorAlert';
+import { Link, useNavigate } from 'react-router-dom';
+import AuthLayout from '../components/AuthLayout';
+import InputField from '../components/InputField';
+import SubmitButton from '../components/SubmitButton';
+import ErrorAlert from '../components/ErrorAlert';
 import { validateEmail, validatePassword } from '../utlis/validation';
-import Cookies from 'js-cookie'; // Import js-cookie
+import { loginUser } from '../services/authServices';
 import { toast } from 'react-toastify';
+
+
+import { jwtDecode } from 'jwt-decode';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -22,18 +25,13 @@ function Login() {
     password: false,
   });
   const [isFormValid, setIsFormValid] = useState(false);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Validate the form whenever inputs change
     const emailError = validateEmail(email);
     const passwordError = validatePassword(password);
 
-    setErrors({
-      email: emailError,
-      password: passwordError,
-    });
-
+    setErrors({ email: emailError, password: passwordError });
     setIsFormValid(!emailError && !passwordError);
   }, [email, password]);
 
@@ -43,47 +41,28 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setTouched({ email: true, password: true });
 
-    // Set all fields as touched to show validation errors
-    setTouched({
-      email: true,
-      password: true,
-    });
-
-    if (!isFormValid) {
-      return;
-    }
-
+    if (!isFormValid) return;
     setLoading(true);
     setError('');
 
     try {
-      // This would connect to your Node.js backend
-      const response = await fetch('https://dashboard-api-7vei.onrender.com/api/user/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        toast.error('Login failed');
-        throw new Error(data.message || 'Login failed');
+      const data = await loginUser(email, password);
+      const token = data.accessToken;
+      const decoded = jwtDecode(token);
+      console.log('Decoded token:', decoded);
+      const role = decoded.role; // Replace with actual role from decoded token
+      if (role === "ADMIN") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/user/home");
       }
-      console.log("data", data);
-
-      Cookies.set('token', data.accessToken);
-
-      // Redirect to dashboard or home page
-      toast.success("login  successful");
-      navigate('/dashboard'); // Use navigate for redirection
+      toast.success('Login successful');
 
     } catch (err) {
-      toast.error('Login failed. Please try again.');
-      setError(err.message || 'Something went wrong. Please try again.');
+      toast.error(err.message);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -92,7 +71,6 @@ function Login() {
   return (
     <AuthLayout title="Welcome Back" subtitle="Please sign in to your account">
       {error && <ErrorAlert message={error} />}
-
       <form onSubmit={handleSubmit} noValidate>
         <InputField
           id="email"
@@ -105,7 +83,6 @@ function Login() {
           required
           error={touched.email ? errors.email : ''}
         />
-
         <div className="mb-6">
           <div className="flex justify-between mb-2">
             <label htmlFor="password" className="text-sm font-medium text-gray-700">
@@ -130,15 +107,8 @@ function Login() {
             <p className="mt-1 text-sm text-red-500">{errors.password}</p>
           )}
         </div>
-
-        <SubmitButton
-          loading={loading}
-          text="Sign In"
-          loadingText="Signing in..."
-          disabled={!isFormValid}
-        />
+        <SubmitButton loading={loading} text="Sign In" loadingText="Signing in..." disabled={!isFormValid} />
       </form>
-
       <div className="mt-8 text-center">
         <p className="text-gray-600">
           Don't have an account?{' '}

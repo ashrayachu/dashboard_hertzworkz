@@ -6,19 +6,19 @@ const EditProfileModal = ({ show, onClose, initialData, onUpdate }) => {
     const [formData, setFormData] = useState({
         username: initialData.name || '',
         email: initialData.email || '',
-        phoneNumber: initialData.phoneNumber || ''
+        mobileNumber: initialData.mobileNumber || ''
     });
 
     const usernameInputRef = useRef(null);
     const emailInputRef = useRef(null);
-    const phoneInputRef = useRef(null);
+    const mobileNumberRef = useRef(null);
 
     useEffect(() => {
         // Update formData when initialData changes, ensuring controlled state
         setFormData({
             username: initialData.name || '',
             email: initialData.email || '',
-            phoneNumber: initialData.mobileNumber || ''
+            mobileNumber: initialData.mobileNumber || ''
         });
     }, [initialData]);
     console.log('Form Data:', formData);
@@ -38,8 +38,8 @@ const EditProfileModal = ({ show, onClose, initialData, onUpdate }) => {
             if (e.target.name === 'username') {
                 emailInputRef.current?.focus();
             } else if (e.target.name === 'email') {
-                phoneInputRef.current?.focus();
-            } else if (e.target.name === 'phoneNumber') {
+                mobileNumberRef.current?.focus();
+            } else if (e.target.name === 'mobileNumber') {
                 handleSubmit(e);
             }
         }
@@ -92,30 +92,15 @@ const EditProfileModal = ({ show, onClose, initialData, onUpdate }) => {
                     </div>
 
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            onKeyDown={handleKeyDown}
-                            ref={emailInputRef}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            autoComplete="off"
-                        />
-                    </div>
-
-                    <div>
                         <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
                         <input
                             type="text"
-                            id="phoneNumber"
-                            name="phoneNumber"
-                            value={formData.phoneNumber}
+                            id="mobileNumber"
+                            name="mobileNumber"
+                            value={formData.mobileNumber}
                             onChange={handleInputChange}
                             onKeyDown={handleKeyDown}
-                            ref={phoneInputRef}
+                            ref={mobileNumberRef}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             autoComplete="off"
                         />
